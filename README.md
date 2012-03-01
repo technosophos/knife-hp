@@ -11,11 +11,18 @@ Be sure you are running the latest version Chef. Versions earlier than 0.10.0 do
 
 This plugin currently depends on HP's fork of Fog. To install it, run:
 
-    $
+    $ cd /tmp
+    $ wget http://build.hpcloud.com/sites/default/files/downloads/hpfog_2.tar
+    $ tar -xf hpfog_2.tar
+    $ gem install ./hpfog-0.0.14.gem
 
 This plugin is distributed as a Ruby Gem, but is not available on Rubygems.org because of the missing Fog dependencies. To install it, run:
 
-    $
+    $ cd /tmp
+    $ git clone -b 0.1.0 git://github.com/mattray/knife-hp.git
+    $ cd knife-hp
+    $ gem build knife-hp.gemspec
+    $ gem install knife-hp-0.1.0.gem
 
 Depending on your system's configuration, you may need to run this command with root privileges.
 
@@ -75,7 +82,9 @@ Outputs a list of all available images available to the currently configured HP 
 
 This is a list of features currently lacking and (eventually) under development:
 
+* how are public IP's assigned at bootstrap?
 * need an ohai plugin to populate `cloud` and `hp` attributes
+* support both AZs
 * take either the flavor ID or the flavor name
 * take either the image ID or the image name
 
