@@ -30,19 +30,19 @@ Depending on your system's configuration, you may need to run this command with 
 
 In order to communicate with HP Compute Cloud's API you will need to tell Knife XXX. The easiest way to accomplish this is to create these entries in your `knife.rb` file:
 
-    knife[:hp_account_id] = "Your HP account ID"
-    knife[:hp_secret_key] = "Your HP secret key"
-    knife[:hp_auth_uri]   = "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/"
-    knife[:hp_avl_zone]   = "Your_active_availability_zone" (optional, defaults to :az1)
-    knife[:hp_tenant_id]  = "Your HP tenant ID"
+    knife[:hp_account_id] = "Your HP Cloud account ID"
+    knife[:hp_secret_key] = "Your HP Cloud secret key"
+    knife[:hp_tenant_id]  = "Your HP Cloud tenant ID"
+    knife[:hp_auth_uri]   = "Your HP Cloud Auth URI" (optional, defaults to "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/")
+    knife[:hp_avl_zone]   = "Your HP Cloud Availability Zone" (optional, defaults to "az1")
 
 If your knife.rb file will be checked into a SCM system (ie readable by others) you may want to read the values from environment variables:
 
     knife[:hp_account_id] = "#{ENV['HP_ACCOUNT']}"
     knife[:hp_secret_key] = "#{ENV['HP_SECRET]}"
+    knife[:hp_tenant_id]  = "#{ENV['HP_TENANT]}"
     knife[:hp_auth_uri]   = "#{ENV['HP_AUTH]}"
     knife[:hp_avl_zone]   = "#{ENV['HP_AVL_ZONE]}"
-    knife[:hp_tenant_id]  = "#{ENV['HP_TENANT]}"
 
 You also have the option of passing your HP API username, password and tenant into the individual knife subcommands using the `-A` (or `--hp-account`), `-K` (or `--hp-secret`) and `-T` (or `--hp-tenant`) command options
 
