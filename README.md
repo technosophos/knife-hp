@@ -32,15 +32,21 @@ In order to communicate with HP Compute Cloud's API you will need to tell Knife 
 
     knife[:hp_account_id] = "Your HP account ID"
     knife[:hp_secret_key] = "Your HP secret key"
+    knife[:hp_auth_uri]   = "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/"
+    knife[:hp_avl_zone]   = "Your_active_availability_zone" (optional, defaults to :az1)
+    knife[:hp_tenant_id]  = "Your HP tenant ID"
 
 If your knife.rb file will be checked into a SCM system (ie readable by others) you may want to read the values from environment variables:
 
     knife[:hp_account_id] = "#{ENV['HP_ACCOUNT']}"
     knife[:hp_secret_key] = "#{ENV['HP_SECRET]}"
+    knife[:hp_auth_uri]   = "#{ENV['HP_AUTH]}"
+    knife[:hp_avl_zone]   = "#{ENV['HP_AVL_ZONE]}"
+    knife[:hp_tenant_id]  = "#{ENV['HP_TENANT]}"
 
-You also have the option of passing your HP API Username/Password into the individual knife subcommands using the `-A` (or `--hp-account`) `-K` (or `--hp-secret`) command options
+You also have the option of passing your HP API username, password and tenant into the individual knife subcommands using the `-A` (or `--hp-account`), `-K` (or `--hp-secret`) and `-T` (or `--hp-tenant`) command options
 
-    knife hp server create -A 'MyUsername' -K 'MyPassword' -f 1 -I 13 -S matt -r 'role[webserver]'
+    knife hp server create -A 'MyUsername' -K 'MyPassword' -T 'MyTenant' -f 1 -I 13 -S hpkeypair -r 'role[webserver]'
 
 Additionally the following options may be set in your `knife.rb`:
 
