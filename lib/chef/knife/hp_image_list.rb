@@ -20,9 +20,9 @@ require 'chef/knife/hp_base'
 
 class Chef
   class Knife
-    class HPImageList < Knife
+    class HpImageList < Knife
 
-      include Knife::HPBase
+      include Knife::HpBase
 
       banner "knife hp image list (options)"
 

@@ -20,7 +20,7 @@ require 'chef/knife'
 
 class Chef
   class Knife
-    module HPBase
+    module HpBase
 
       # :nodoc:
       # Would prefer to do this in a rational way, but can't be done b/c of
@@ -68,14 +68,18 @@ class Chef
       end
 
       def connection
+        Chef::Log.debug("hp_account_id: #{Chef::Config[:knife][:hp_account_id]}")
+        Chef::Log.debug("hp_secret_key: #{Chef::Config[:knife][:hp_secret_key]}")
+        Chef::Log.debug("hp_tenant_id: #{Chef::Config[:knife][:hp_tenant_id]}")
+        Chef::Log.debug("hp_auth_uri: #{locate_config_value(:hp_auth_uri)}")
+        Chef::Log.debug("hp_avl_zone: #{locate_config_value(:hp_avl_zone)}")
         @connection ||= begin
                           connection = Fog::Compute.new(
             :provider => 'HP',
             :hp_account_id => Chef::Config[:knife][:hp_account_id],
             :hp_secret_key => Chef::Config[:knife][:hp_secret_key],
             :hp_tenant_id => Chef::Config[:knife][:hp_tenant_id],
-            :hp_auth_uri => Chef::Config[:knife][:hp_auth_uri],
-            :hp_avl_zone => locate_config_value(:hp_avl_zone)
+            :hp_auth_uri => locate_config_value(:hp_auth_uri)
             )
                         end
       end

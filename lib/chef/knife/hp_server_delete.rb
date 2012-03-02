@@ -20,9 +20,9 @@ require 'chef/knife/hp_base'
 
 class Chef
   class Knife
-    class HPServerDelete < Knife
+    class HpServerDelete < Knife
 
-      include Knife::HPBase
+      include Knife::HpBase
 
       banner "knife hp server delete SERVER [SERVER] (options)"
 

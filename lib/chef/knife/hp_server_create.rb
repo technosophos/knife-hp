@@ -20,9 +20,9 @@ require 'chef/knife/hp_base'
 
 class Chef
   class Knife
-    class HPServerCreate < Knife
+    class HpServerCreate < Knife
 
-      include Knife::HPBase
+      include Knife::HpBase
 
       deps do
         require 'fog'
