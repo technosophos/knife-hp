@@ -20,9 +20,9 @@ require 'chef/knife/hp_base'
 
 class Chef
   class Knife
-    class HPFlavorList < Knife
+    class HpFlavorList < Knife
 
-      include Knife::HPBase
+      include Knife::HpBase
 
       banner "knife hp flavor list (options)"
 
@@ -33,14 +33,14 @@ class Chef
         flavor_list = [
           ui.color('ID', :bold),
           ui.color('Name', :bold),
-          ui.color('Virtual CPUs', :bold),
+          ui.color('Cores', :bold),
           ui.color('RAM', :bold),
           ui.color('Disk', :bold),
         ]
         connection.flavors.sort_by(&:id).each do |flavor|
           flavor_list << flavor.id.to_s
           flavor_list << flavor.name
-          flavor_list << flavor.vcpus.to_s
+          flavor_list << flavor.cores.to_s
           flavor_list << "#{flavor.ram.to_s} MB"
           flavor_list << "#{flavor.disk.to_s} GB"
         end
