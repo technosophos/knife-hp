@@ -88,6 +88,7 @@ Outputs a list of all available images available to the currently configured HP 
 
 This is a list of features currently lacking and (eventually) under development:
 
+* add availability zone to connection
 * how are public IP's assigned at bootstrap?
 * need an ohai plugin to populate `cloud` and `hp` attributes
 * support both AZs
