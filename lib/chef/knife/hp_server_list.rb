@@ -49,7 +49,7 @@ class Chef
           server_list << (server.private_ip_address or "")
           server_list << server.flavor['id'].to_s
           server_list << server.image['id'].to_s
-          server_list << server.key_name
+          server_list << (server.key_name or "")
           server_list << begin
                            state = server.state.to_s.downcase
                            case state
