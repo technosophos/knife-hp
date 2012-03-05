@@ -49,7 +49,7 @@ class Chef
           option :hp_tenant_id,
           :short => "-T ID",
           :long => "--hp-tenant ID",
-          :description => "Your HP Cloud Tenant",
+          :description => "Your HP Cloud Tenant ID",
           :proc => Proc.new { |key| Chef::Config[:knife][:hp_tenant_id] = key }
 
           option :hp_auth_uri,
@@ -79,7 +79,8 @@ class Chef
             :hp_account_id => Chef::Config[:knife][:hp_account_id],
             :hp_secret_key => Chef::Config[:knife][:hp_secret_key],
             :hp_tenant_id => Chef::Config[:knife][:hp_tenant_id],
-            :hp_auth_uri => locate_config_value(:hp_auth_uri)
+            :hp_auth_uri => locate_config_value(:hp_auth_uri),
+            :hp_avl_zone => locate_config_value(:hp_avl_zone).to_sym
             )
                         end
       end

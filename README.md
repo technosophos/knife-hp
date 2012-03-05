@@ -28,13 +28,13 @@ Depending on your system's configuration, you may need to run this command with 
 
 # Configuration #
 
-In order to communicate with HP Compute Cloud's API you will need to tell Knife XXX. The easiest way to accomplish this is to create these entries in your `knife.rb` file:
+In order to communicate with HP Compute Cloud's API you will need to tell Knife the account ID, the secret key and tenant ID (you may also override the auth URI and availability zone. The easiest way to accomplish this is to create these entries in your `knife.rb` file:
 
     knife[:hp_account_id] = "Your HP Cloud account ID"
     knife[:hp_secret_key] = "Your HP Cloud secret key"
     knife[:hp_tenant_id]  = "Your HP Cloud tenant ID"
-    knife[:hp_auth_uri]   = "Your HP Cloud Auth URI" (optional, defaults to "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/")
-    knife[:hp_avl_zone]   = "Your HP Cloud Availability Zone" (optional, defaults to "az1")
+    knife[:hp_auth_uri]   = "Your HP Cloud Auth URI" (optional, default is "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/")
+    knife[:hp_avl_zone]   = "Your HP Cloud Availability Zone" (optional, default is "az1")
 
 If your knife.rb file will be checked into a SCM system (ie readable by others) you may want to read the values from environment variables:
 
@@ -44,7 +44,13 @@ If your knife.rb file will be checked into a SCM system (ie readable by others) 
     knife[:hp_auth_uri]   = "#{ENV['HP_AUTH]}"
     knife[:hp_avl_zone]   = "#{ENV['HP_AVL_ZONE]}"
 
-You also have the option of passing your HP API username, password and tenant into the individual knife subcommands using the `-A` (or `--hp-account`), `-K` (or `--hp-secret`) and `-T` (or `--hp-tenant`) command options
+You also have the option of passing your HP Cloud API options from the command line:
+
+    `-A` (or `--hp-account`) your HP Cloud Access Key ID
+    `-K` (or `--hp-secret`) your HP Cloud Secret Key
+    `-T` (or `--hp-tenant`) your HP Cloud Tenant ID
+    `--hp-auth` your HP Cloud Auth URI (optional, default is "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/")
+    `-Z` (or `--hp-zone`) your HP Cloud Availability Zone (optional, default is "az1")
 
     knife hp server create -A 'MyUsername' -K 'MyPassword' -T 'MyTenant' -f 1 -I 13 -S hpkeypair -r 'role[webserver]'
 
@@ -88,7 +94,6 @@ Outputs a list of all available images available to the currently configured HP 
 
 This is a list of features currently lacking and (eventually) under development:
 
-* add availability zone to connection
 * how are public IP's assigned at bootstrap?
 * need an ohai plugin to populate `cloud` and `hp` attributes
 * support both AZs
