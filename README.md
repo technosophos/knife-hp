@@ -88,17 +88,18 @@ Outputs a list of all available flavors (available hardware configuration for a 
 knife hp image list
 -------------------
 
-Outputs a list of all available images available to the currently configured HP Compute Cloud account. An image is a collection of files used to create or rebuild a server. This data can be useful when choosing an image id to pass to the `knife hp server create` subcommand.
+Outputs a list of all available images available to the currently configured HP Compute Cloud account. An image is a collection of files used to create or rebuild a server. Currently the list returned is unfiltered and does not match the view on the dashboard, images with "(Kernel)" and "(Ramdisk)" are not intended for use bootstrapping. This data can be useful when choosing an image id to pass to the `knife hp server create` subcommand.
 
 # TODO #
 
 This is a list of features currently lacking and (eventually) under development:
 
+* filter out extraneous images from knife hp image list (requires HP metadata not yet available)
 * how are public IP's assigned at bootstrap?
 * need an ohai plugin to populate `cloud` and `hp` attributes
-* support both AZs
 * take either the flavor ID or the flavor name
 * take either the image ID or the image name
+* show the flavor and image names in server lists
 
 # License #
 

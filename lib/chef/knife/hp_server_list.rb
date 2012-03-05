@@ -38,14 +38,14 @@ class Chef
           ui.color('Private IP', :bold),
           ui.color('Flavor', :bold),
           ui.color('Image', :bold),
-          ui.color('Keypair', :bold),
+          ui.color('Key Pair', :bold),
           ui.color('State', :bold)
         ]
         connection.servers.all.sort_by(&:id).each do |server|
           server_list << server.id.to_s
           server_list << server.name
-          server_list << server.public_ip_address['addr'].to_s
-          server_list << server.private_ip_address['addr'].to_s
+          server_list << (server.public_ip_address or "")
+          server_list << server.private_ip_address
           server_list << server.flavor['id'].to_s
           server_list << server.image['id'].to_s
           server_list << server.key_name
