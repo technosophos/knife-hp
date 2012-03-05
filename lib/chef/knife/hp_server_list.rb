@@ -42,17 +42,18 @@ class Chef
           ui.color('State', :bold)
         ]
         connection.servers.all.sort_by(&:id).each do |server|
+          Chef::Log.debug("Server: #{server.to_yaml}")
           server_list << server.id.to_s
           server_list << server.name
           server_list << (server.public_ip_address or "")
-          server_list << server.private_ip_address
+          server_list << (server.private_ip_address or "")
           server_list << server.flavor['id'].to_s
           server_list << server.image['id'].to_s
           server_list << server.key_name
           server_list << begin
                            state = server.state.to_s.downcase
                            case state
-                           when 'shutting-down','terminated','stopping','stopped'
+                           when 'shutting-down','terminated','stopping','stopped','active(deleting)'
                              ui.color(state, :red)
                            when 'pending'
                              ui.color(state, :yellow)
