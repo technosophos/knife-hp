@@ -34,37 +34,35 @@ class Chef
 
       banner "knife hp server create (options)"
 
-      attr_accessor :initial_sleep_delay
-
       option :flavor,
       :short => "-f FLAVOR_ID",
       :long => "--flavor FLAVOR_ID",
-      :description => "The flavor ID of server (m1.small, m1.medium, etc)",
+      :description => "The HP Cloud Size for the server",
       :proc => Proc.new { |f| Chef::Config[:knife][:flavor] = f }
 
       option :image,
       :short => "-I IMAGE_ID",
       :long => "--image IMAGE_ID",
-      :description => "The image ID for the server",
+      :description => "The HP Cloud Install Image ID for the server",
       :proc => Proc.new { |i| Chef::Config[:knife][:image] = i }
 
-      # option :security_groups,
-      # :short => "-G X,Y,Z",
-      # :long => "--groups X,Y,Z",
-      # :description => "The security groups for this server",
-      # :default => ["default"],
-      # :proc => Proc.new { |groups| groups.split(',') }
+      option :security_groups,
+      :short => "-G X,Y,Z",
+      :long => "--groups X,Y,Z",
+      :description => "The HP Cloud Security Group(s) for this server",
+      :default => ["default"],
+      :proc => Proc.new { |groups| groups.split(',') }
+
+      option :ssh_key_name,
+      :short => "-S KEY",
+      :long => "--ssh-key KEY",
+      :description => "The HP Cloud Key Pair ID",
+      :proc => Proc.new { |key| Chef::Config[:knife][:hp_ssh_key_id] = key }
 
       option :chef_node_name,
       :short => "-N NAME",
       :long => "--node-name NAME",
       :description => "The Chef node name for your new node"
-
-      option :ssh_key_name,
-      :short => "-S KEY",
-      :long => "--ssh-key KEY",
-      :description => "The Hp SSH keypair id",
-      :proc => Proc.new { |key| Chef::Config[:knife][:hp_ssh_key_id] = key }
 
       option :ssh_user,
       :short => "-x USERNAME",
@@ -111,12 +109,6 @@ class Chef
       :proc => lambda { |o| o.split(/[\s,]+/) },
       :default => []
 
-      # option :no_host_key_verify,
-      #   :long => "--no-host-key-verify",
-      #   :description => "Disable host key verification",
-      #   :boolean => true,
-      #   :default => false
-
       def tcp_test_ssh(hostname)
         tcp_socket = TCPSocket.new(hostname, 22)
         readable = IO.select([tcp_socket], nil, nil, 5)
@@ -147,33 +139,42 @@ class Chef
         validate!
 
         connection = Fog::Compute.new(
-          :provider => 'Hp',
-          :hp_username => Chef::Config[:knife][:hp_username],
-          :hp_api_key => Chef::Config[:knife][:hp_password],
-          :hp_auth_url => Chef::Config[:knife][:hp_auth_url]
+          :provider => 'HP',
+          :hp_account_id => Chef::Config[:knife][:hp_account_id],
+          :hp_secret_key => Chef::Config[:knife][:hp_secret_key],
+          :hp_tenant_id => Chef::Config[:knife][:hp_tenant_id],
+          :hp_auth_uri => locate_config_value(:hp_auth_uri),
+          :hp_avl_zone => locate_config_value(:hp_avl_zone).to_sym
           )
 
         server_def = {
         :name => config[:chef_node_name],
-        :image_ref => locate_config_value(:image),
-        :flavor_ref => locate_config_value(:flavor),
-        #:groups => config[:security_groups],
+        :flavor_id => locate_config_value(:flavor),
+        :image_id => locate_config_value(:image),
+        :security_groups => config[:security_groups],
         :key_name => Chef::Config[:knife][:hp_ssh_key_id]
       }
 
       Chef::Log.debug("Name #{config[:chef_node_name]}")
-      Chef::Log.debug("Image #{locate_config_value(:image)}")
       Chef::Log.debug("Flavor #{locate_config_value(:flavor)}")
-      #Chef::Log.debug("Groups #{config[:security_groups]}")
-      Chef::Log.debug("Creating server #{server_def}")
+      Chef::Log.debug("Image #{locate_config_value(:image)}")
+      Chef::Log.debug("Group(s) #{config[:security_groups]}")
+      Chef::Log.debug("Key Pair #{Chef::Config[:knife][:hp_ssh_key_id]}")
+
       server = connection.servers.create(server_def)
+
+      #request and assign a floating IP for the server
+      floating_address = connection.addresses.create()
+      Chef::Log.debug("Floating IP #{floating_address.ip}")
 
       msg_pair("Instance ID", server.id)
       msg_pair("Instance Name", server.name)
       msg_pair("Flavor", server.flavor['id'])
       msg_pair("Image", server.image['id'])
-      #msg_pair("Security Groups", server.groups.join(", "))
-      msg_pair("SSH Keypair", server.key_name)
+      #msg_pair("Security Group(s)", server.security_groups.join(", "))
+      msg_pair("SSH Key Pair", server.key_name)
+
+      floating_address.server = server
 
       print "\n#{ui.color("Waiting for server", :magenta)}"
 
@@ -182,13 +183,13 @@ class Chef
 
       puts("\n")
 
-      msg_pair("Public IP Address", server.public_ip_address['addr'])
-      msg_pair("Private IP Address", server.private_ip_address['addr'])
+      msg_pair("Public IP Address", server.public_ip_address)
+      msg_pair("Private IP Address", server.private_ip_address)
 
       print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
-      print(".") until tcp_test_ssh(server.public_ip_address['addr']) {
-        sleep @initial_sleep_delay ||= 10
+      print(".") until tcp_test_ssh(server.public_ip_address) {
+p        sleep @initial_sleep_delay ||= 10
         puts("done")
       }
 
@@ -199,17 +200,17 @@ class Chef
       msg_pair("Instance Name", server.name)
       msg_pair("Flavor", server.flavor['id'])
       msg_pair("Image", server.image['id'])
-      #msg_pair("Security Groups", server.groups.join(", "))
-      msg_pair("SSH Keypair", server.key_name)
-      msg_pair("Public IP Address", server.public_ip_address['addr'])
-      msg_pair("Private IP Address", server.private_ip_address['addr'])
+      #msg_pair("Security Group(s)", server.security_groups.join(", "))
+      msg_pair("SSH Key Pair", server.key_name)
+      msg_pair("Public IP Address", server.public_ip_address)
+      msg_pair("Private IP Address", server.private_ip_address)
       msg_pair("Environment", config[:environment] || '_default')
       msg_pair("Run List", config[:run_list].join(', '))
     end
 
     def bootstrap_for_node(server)
       bootstrap = Chef::Knife::Bootstrap.new
-      bootstrap.name_args = [server.public_ip_address['addr']]
+      bootstrap.name_args = [server.public_ip_address]
       bootstrap.config[:run_list] = config[:run_list]
       bootstrap.config[:ssh_user] = config[:ssh_user]
       bootstrap.config[:identity_file] = config[:identity_file]
@@ -220,8 +221,6 @@ class Chef
       bootstrap.config[:use_sudo] = true unless config[:ssh_user] == 'root'
       bootstrap.config[:template_file] = locate_config_value(:template_file)
       bootstrap.config[:environment] = config[:environment]
-      # may be needed for vpc_mode
-      #bootstrap.config[:no_host_key_verify] = config[:no_host_key_verify]
       bootstrap
     end
 
@@ -231,7 +230,7 @@ class Chef
 
     def validate!
 
-      super([:image, :hp_ssh_key_id, :hp_username, :hp_password, :hp_auth_url])
+      super([:image, :flavor, :hp_account_id, :hp_secret_key, :hp_tenant_id])
 
       if ami.nil?
         ui.error("You have not provided a valid image ID. Please note the short option for this value recently changed from '-i' to '-I'.")
