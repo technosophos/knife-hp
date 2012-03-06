@@ -190,8 +190,13 @@ class Chef
 
       print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
+      #hack to ensure the nodes have had time to spin up
+      print(".")
+      sleep 30
+      print(".")
+
       print(".") until tcp_test_ssh(server.public_ip_address) {
-        sleep @initial_sleep_delay ||= 30
+        sleep @initial_sleep_delay ||= 10
         puts("done")
       }
 
