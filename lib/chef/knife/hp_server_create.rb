@@ -147,19 +147,26 @@ class Chef
           :hp_avl_zone => locate_config_value(:hp_avl_zone).to_sym
           )
 
+        #request and assign a floating IP for the server
+        address = connection.addresses.create()
+        Chef::Log.debug("Floating IP #{address.ip}")
+
+        #servers require a name, generate one if not passed
+        node_name = get_node_name(config[:chef_node_name], address.ip)
+
+        Chef::Log.debug("Name #{node_name}")
+        Chef::Log.debug("Flavor #{locate_config_value(:flavor)}")
+        Chef::Log.debug("Image #{locate_config_value(:image)}")
+        Chef::Log.debug("Group(s) #{config[:security_groups]}")
+        Chef::Log.debug("Key Pair #{Chef::Config[:knife][:hp_ssh_key_id]}")
+
         server_def = {
-        :name => config[:chef_node_name],
+        :name => node_name,
         :flavor_id => locate_config_value(:flavor),
         :image_id => locate_config_value(:image),
         :security_groups => config[:security_groups],
         :key_name => Chef::Config[:knife][:hp_ssh_key_id]
       }
-
-      Chef::Log.debug("Name #{config[:chef_node_name]}")
-      Chef::Log.debug("Flavor #{locate_config_value(:flavor)}")
-      Chef::Log.debug("Image #{locate_config_value(:image)}")
-      Chef::Log.debug("Group(s) #{config[:security_groups]}")
-      Chef::Log.debug("Key Pair #{Chef::Config[:knife][:hp_ssh_key_id]}")
 
       server = connection.servers.create(server_def)
 
@@ -169,10 +176,6 @@ class Chef
       msg_pair("Image", server.image['id'])
       #msg_pair("Security Group(s)", server.security_groups.join(", "))
       msg_pair("SSH Key Pair", server.key_name)
-
-      #request and assign a floating IP for the server
-      address = connection.addresses.create()
-      Chef::Log.debug("Floating IP #{address.ip}")
 
       print "\n#{ui.color("Waiting for server", :magenta)}"
 
@@ -245,6 +248,11 @@ class Chef
       end
     end
 
+    #generate a name from the IP if chef_node_name is empty
+    def get_node_name(chef_node_name, ipaddress)
+      return chef_node_name unless chef_node_name.nil?
+      chef_node_name = "hp"+ipaddress.gsub(/\./,'-')
+    end
   end
 end
 end
