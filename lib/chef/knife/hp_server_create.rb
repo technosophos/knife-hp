@@ -163,10 +163,6 @@ class Chef
 
       server = connection.servers.create(server_def)
 
-      #request and assign a floating IP for the server
-      floating_address = connection.addresses.create()
-      Chef::Log.debug("Floating IP #{floating_address.ip}")
-
       msg_pair("Instance ID", server.id)
       msg_pair("Instance Name", server.name)
       msg_pair("Flavor", server.flavor['id'])
@@ -174,11 +170,17 @@ class Chef
       #msg_pair("Security Group(s)", server.security_groups.join(", "))
       msg_pair("SSH Key Pair", server.key_name)
 
-      floating_address.server = server
+      #request and assign a floating IP for the server
+      address = connection.addresses.create()
+      Chef::Log.debug("Floating IP #{address.ip}")
 
       print "\n#{ui.color("Waiting for server", :magenta)}"
 
       # wait for it to be ready to do stuff
+      server.wait_for { print "."; ready? }
+
+      address.server = server
+
       server.wait_for { print "."; ready? }
 
       puts("\n")
@@ -189,7 +191,7 @@ class Chef
       print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
       print(".") until tcp_test_ssh(server.public_ip_address) {
-p        sleep @initial_sleep_delay ||= 10
+        sleep @initial_sleep_delay ||= 30
         puts("done")
       }
 
