@@ -4,7 +4,7 @@ require "knife-hp/version"
 
 Gem::Specification.new do |s|
   s.name        = "knife-hp"
-  s.version     = Knife::HP::VERSION
+  s.version     = Knife::Hp::VERSION
   s.platform    = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README.md", "LICENSE" ]
