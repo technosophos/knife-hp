@@ -52,7 +52,7 @@ You also have the option of passing your HP Cloud API options from the command l
     `--hp-auth` your HP Cloud Auth URI (optional, default is "https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/")
     `-Z` (or `--hp-zone`) your HP Cloud Availability Zone (optional, default is "az1")
 
-    knife hp server create -A 'MyUsername' -K 'MyPassword' -T 'MyTenant' -f 1 -I 13 -S hpkeypair -r 'role[webserver]'
+    knife hp server create -A 'MyUsername' -K 'MyPassword' -T 'MyTenant' -f 1 -I 13 -S hpkeypair -i ~/.ssh/hpkeypair.pem -r 'role[webserver]'
 
 Additionally the following options may be set in your `knife.rb`:
 
@@ -68,7 +68,9 @@ This plugin provides the following Knife subcommands. Specific command options c
 knife hp server create
 ----------------------
 
-Provisions a new server in the HP Compute Cloud and then perform a Chef bootstrap (using the SSH protocol). The goal of the bootstrap is to get Chef installed on the target system so it can run Chef Client with a Chef Server. The main assumption is a baseline OS installation exists (provided by the provisioning). It is primarily intended for Chef Client systems that talk to a Chef Server. By default the server is bootstrapped using the [ubuntu10.04-gems](https://github.com/opscode/chef/blob/master/chef/lib/chef/knife/bootstrap/ubuntu10.04-gems.erb) template. This can be overridden using the `-d` or `--template-file` command options.
+Provisions a new server in the HP Compute Cloud and then perform a Chef bootstrap (using the SSH protocol). The goal of the bootstrap is to get Chef installed on the target system so it can run Chef Client with a Chef Server. The main assumption is a baseline OS installation exists (provided by the provisioning). It is primarily intended for Chef Client systems that talk to a Chef Server. By default the server is bootstrapped using the [ubuntu10.04-gems](https://github.com/opscode/chef/blob/master/chef/lib/chef/knife/bootstrap/ubuntu10.04-gems.erb) template. This can be overridden using the `-d` or `--template-file` command options. If you do not pass a node name with `-N NAME` (or `--node-name NAME`) a name will be generated for the node.
+
+    knife hp server create -f 1 -I 13 -S hpkeypair -i ~/.ssh/hpkeypair.pem
 
 knife hp server delete
 ----------------------
@@ -95,8 +97,9 @@ Outputs a list of all available images available to the currently configured HP 
 This is a list of features currently lacking and (eventually) under development:
 
 * filter out extraneous images from knife hp image list (requires HP metadata not yet available)
-* how are public IP's assigned at bootstrap?
-* need an ohai plugin to populate `cloud` and `hp` attributes
+* do we need to release associated IP addresses for deleted servers?
+* should the node.name and node.id be the same (might have to fix this in the ohai plugin)
+* need ohai plugin to populate `cloud` and `hp` attributes from http://tickets.opscode.com/browse/OHAI-335
 * take either the flavor ID or the flavor name
 * take either the image ID or the image name
 * show the flavor and image names in server lists
