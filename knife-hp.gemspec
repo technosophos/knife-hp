@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Matt Ray"]
   s.email       = ["matt@opscode.com"]
   s.homepage    = "https://github.com/opscode/knife-hp"
-  s.summary     = %q{HP Cloud Compute support for Chef's Knife command}
+  s.summary     = %q{HP Cloud Services Cloud support for Chef's Knife command}
   s.description = s.summary
 
   s.files         = `git ls-files`.split("\n")
@@ -20,4 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "hpfog", "~> 0.0.14"
+  s.add_dependency "highline", ">= 1.6.9"
+  s.add_dependency "chef", "~> 0.10"
+
 end
